@@ -89,7 +89,9 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+dist/assetss
+dist/index.html
+dist/vite.svg
 
 # Gatsby files
 .cache/
@@ -128,3 +130,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+frontend/dist/assets/index-BG2lYlgm.js
+frontend/dist/assets/index-CFLq7A-_.css
