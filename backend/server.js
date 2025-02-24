@@ -2,12 +2,22 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const compression = require('compression'); 
+const rateLimit = require("express-rate-limit");
 
 const app = express();
+app.use(compression()); 
 app.use(express.json());
 app.use(cors());
 
-// 🔥 Eksport aplikacji bez `app.listen()`, aby użyć jej w testach
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuta
+  max: 100, // Maksymalnie 100 zapytań na minutę z jednego IP
+  message: { error: "Zbyt wiele żądań, spróbuj ponownie później." }
+});
+
+app.use(limiter); //
+
 module.exports = (async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
