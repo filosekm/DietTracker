@@ -27,14 +27,12 @@ const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/productRoutes");
 const mealRoutes = require("./routes/mealsRoutes");
 const activityRoutes = require("./routes/activityRoutes");
-const goalsRoutes = require("./routes/goalsRoutes"); // 📌 Dodano obsługę celów dietetycznych
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/activities", activityRoutes);
-app.use("/api/goals", goalsRoutes); // 📌 Trasa dla celów dietetycznych
 
 // ✅ Obsługa plików statycznych (Vue frontend)
 app.use(express.static(path.join(__dirname, "public")));
