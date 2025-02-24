@@ -1,5 +1,6 @@
 const express = require("express");
-const { register, login, getProfile, updateProfile } = require("../controllers/userController");
+const { updateProfile } = require("../controllers/userController"); // Obsługuje edycję profilu
+const { register, login, getProfile } = require("../controllers/authController"); // Obsługuje rejestrację, logowanie, pobieranie profilu
 const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
