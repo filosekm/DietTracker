@@ -9,17 +9,18 @@ const path = require("path");
 const app = express();
 
 // ✅ Middleware
-app.use(compression());
+app.use(compression({level: 6}));
 app.use(express.json());
 app.use(cors());
 
 // ✅ Ograniczenie liczby zapytań (Rate Limiting)
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minuta
-  max: 100, // Maksymalnie 100 zapytań na minutę z jednego IP
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuta
+  max: 400, // Maksymalnie 100 zapytań na minutę na IP
+  standardHeaders: true, 
+  legacyHeaders: false,
   message: { error: "Zbyt wiele żądań, spróbuj ponownie później." },
 });
-app.use(limiter);
 
 // ✅ Ładowanie tras API
 const userRoutes = require("./routes/userRoutes");
