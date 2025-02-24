@@ -1,25 +1,24 @@
 config:
-  target: "https://backendpraca.onrender.com/"  # Adres backendu
+  target: "https://backendpraca.onrender.com"
   phases:
     - duration: 60  # Test trwa 60 sekund
-      arrivalRate: 10  # 10 żądań na sekundę
-      rampTo: 50  # Stopniowy wzrost do 50 req/s
+      arrivalRate: 5  # 5 użytkowników na sekundę (300 req/min – ale rozłożone)
+  defaults:
+    headers:
+      Authorization: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YmMxNWE2NzliNzhlMWQ0NjliMTA0MyIsImVtYWlsIjoibWFyY2VsLmZpbG9zZWtAd3AucGwiLCJpYXQiOjE3NDAzNzk2MjMsImV4cCI6MTc0MDQ2NjAyM30.qXujFFnziybTf9pD6BOSWyWmJFUS2rRMhoY0uflOJbw"  # Jeśli API wymaga tokena
 
 scenarios:
   - flow:
+      - get:
+          url: "/api/users/goals"  # Pobieranie celów użytkownika
+      - get:
+          url: "/api/meals"  # Pobieranie posiłków
       - post:
-          url: "/api/auth/register"
+          url: "/api/meals"
           json:
-            name: "Test User"
-            email: "test@example.com"
-            password: "test1234"
-            age: 30
-            weight: 75
-            height: 180
-            activity_level: "średni"
-      - think: 2 # Poczekaj 2 sekundy
-      - post:
-          url: "/api/auth/login"
-          json:
-            email: "test@example.com"
-            password: "test1234"
+            name: "Testowy Posiłek"
+            calories: 500
+            protein: 30
+            carbs: 50
+            fats: 10
+      - think: 2  # Pauza 2 sekundy między kolejnymi akcjami użytkownika

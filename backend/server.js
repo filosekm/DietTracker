@@ -5,9 +5,25 @@ const mongoose = require("mongoose");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
+const helmet = require("helmet");
 
 const app = express();
 
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
 // ✅ Middleware
 app.use(compression({level: 6}));
 app.use(express.json());
