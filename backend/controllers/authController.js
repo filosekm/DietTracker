@@ -4,17 +4,29 @@ const User = require("../models/User");
 
 // 🔹 Rejestracja użytkownika
 exports.register = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-
-    await newUser.save();
-    res.status(201).json({ message: "Użytkownik zarejestrowany" });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+    try {
+      const { name, email, password } = req.body;
+  
+      if (!name || !email || !password) {
+        return res.status(400).json({ error: "Imię, email i hasło są wymagane!" });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        // Nie ustawiamy `age`, `weight`, `height` - zostają domyślne wartości
+      });
+  
+      await newUser.save();
+      res.status(201).json({ message: "Użytkownik zarejestrowany" });
+    } catch (error) {
+      console.error("❌ Błąd rejestracji:", error);
+      res.status(500).json({ error: "Błąd serwera" });
+    }
+  };
+  
 
 // 🔹 Logowanie użytkownika
 exports.login = async (req, res) => {
