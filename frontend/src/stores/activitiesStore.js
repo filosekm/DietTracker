@@ -9,7 +9,7 @@ export const useActivitiesStore = defineStore("activities", {
     async loadActivities() {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/api/activities", {
+        const response = await axios.get("https://backendpraca.onrender.com/api/activities", {
           headers: { Authorization: `Bearer ${token}` },
         });
         this.activities = response.data;
@@ -21,7 +21,7 @@ export const useActivitiesStore = defineStore("activities", {
     async addActivity(activity) {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.post("http://localhost:5000/api/activities", activity, {
+        const response = await axios.post("https://backendpraca.onrender.com/api/activities", activity, {
           headers: { Authorization: `Bearer ${token}` },
         });
         this.activities.push(response.data);
@@ -33,7 +33,7 @@ export const useActivitiesStore = defineStore("activities", {
     async removeActivity(id) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/activities/${id}`, {
+        await axios.delete(`https://backendpraca.onrender.com/api/activities/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
