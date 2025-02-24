@@ -33,18 +33,23 @@ export const useMealsStore = defineStore("meals", {
             }
         
             try {
-                const today = new Date().toISOString().split("T")[0]; // 📅 Pobieramy dzisiejszą datę
-        
                 const mealData = {
                     name,
-                    meals: this.meals, // Aktualna lista posiłków do zapisania
+                    meals: this.meals.map(meal => ({
+                        id: meal.id || Date.now(),
+                        name: meal.name || "Nieznany posiłek",
+                        calories: meal.calories || 0,
+                        protein: meal.proteins || 0, // 🚀 Spójność nazewnictwa
+                        carbs: meal.carbs || 0,
+                        fats: meal.fats || 0
+                    }))
                 };
         
-        
-                const response = await axios.post("https://backendpraca.onrender.com/api/meals/history", mealData, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                });
-        
+                const response = await axios.post(
+                    "https://backendpraca.onrender.com/api/meals/history",
+                    mealData,
+                    { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+                );
         
                 this.history.push(response.data);
                 this.clearMeals();
@@ -55,10 +60,12 @@ export const useMealsStore = defineStore("meals", {
 
         async loadHistory() {
             try {
-                const token = localStorage.getItem("token"); // ✅ Pobranie tokena
+                const token = localStorage.getItem("token");
                 const response = await axios.get("https://backendpraca.onrender.com/api/meals/history", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+        
+                console.log("📜 Dane zwrócone przez API:", response.data);
                 this.history = response.data;
             } catch (error) {
                 console.error("❌ Błąd pobierania historii:", error);

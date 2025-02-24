@@ -1,34 +1,46 @@
 import { defineStore } from "pinia";
+import axios from "axios";
 
 export const useActivitiesStore = defineStore("activities", {
   state: () => ({
-    activities: [], // Lista aktywności
+    activities: [],
   }),
   actions: {
-    addActivity(activity) {
-      this.activities.push({
-        id: Date.now(),
-        type: activity.type,
-        duration: activity.duration, // w minutach
-        caloriesBurned: activity.caloriesBurned, // spalone kalorie
-      });
-      this.saveActivities();
-    },
-    removeActivity(id) {
-      this.activities = this.activities.filter(activity => activity.id !== id);
-      this.saveActivities();
-    },
-    saveActivities() {
-      localStorage.setItem("activities", JSON.stringify(this.activities));
-    },
-    loadActivities() {
-      const saved = localStorage.getItem("activities");
-      if (saved) {
-        this.activities = JSON.parse(saved);
+    async loadActivities() {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/api/activities", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.activities = response.data;
+      } catch (error) {
+        console.error("❌ Błąd pobierania aktywności:", error);
       }
     },
-    getTotalCaloriesBurned() {
-      return this.activities.reduce((total, activity) => total + activity.caloriesBurned, 0);
+
+    async addActivity(activity) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.post("http://localhost:5000/api/activities", activity, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.activities.push(response.data);
+      } catch (error) {
+        console.error("❌ Błąd dodawania aktywności:", error);
+      }
+    },
+
+    async removeActivity(id) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:5000/api/activities/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        this.activities = this.activities.filter(activity => activity.id !== id);
+      } catch (error) {
+        console.error("❌ Błąd usuwania aktywności:", error);
+      }
     }
   }
 });
