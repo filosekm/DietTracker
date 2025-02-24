@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Activity = require("../models/Activity");
-const authMiddleware = require("../middleware/authMiddleware"); // Middleware do autoryzacji
+const authMiddleware = require("../middleware/auth"); // Middleware do autoryzacji
 
 // ✅ Pobieranie wszystkich aktywności użytkownika
 router.get("/", authMiddleware, async (req, res) => {
