@@ -30,7 +30,7 @@
 
 <script>
 import axios from "axios";
-import { useAuthStore } from "@stores/auth";
+import { useAuthStore } from "../stores/auth";
 
 export default {
   data() {
@@ -48,7 +48,7 @@ export default {
   },
   async mounted() {
     try {
-      const response = await axios.get("http://localhost:5000/api/users/profile", {
+      const response = await axios.get("https://backendpraca.onrender.com/api/users/profile", {
         headers: { Authorization: `Bearer ${useAuthStore().token}` },
       });
       this.profile = response.data;
@@ -59,7 +59,7 @@ export default {
   methods: {
     async updateProfile() {
       try {
-        const response = await axios.put("http://localhost:5000/api/users/profile", this.profile, {
+        const response = await axios.put("https://backendpraca.onrender.com/api/users/profile", this.profile, {
           headers: { Authorization: `Bearer ${useAuthStore().token}` },
         });
         this.message = "Profil został zaktualizowany";
