@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://diettracker-9bl0.onrender.com/sitemap.xml
