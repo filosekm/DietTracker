@@ -1,0 +1,25 @@
+config:
+  target: "http://localhost:5000"  # Adres backendu
+  phases:
+    - duration: 60  # Test trwa 60 sekund
+      arrivalRate: 10  # 10 żądań na sekundę
+      rampTo: 50  # Stopniowy wzrost do 50 req/s
+
+scenarios:
+  - flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            name: "Test User"
+            email: "test@example.com"
+            password: "test1234"
+            age: 30
+            weight: 75
+            height: 180
+            activity_level: "średni"
+      - think: 2 # Poczekaj 2 sekundy
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "test@example.com"
+            password: "test1234"
