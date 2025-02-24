@@ -51,7 +51,7 @@ const searchProducts = async () => {
   }
 
   try {
-    const response = await axios.get(`http://localhost:5000/api/products/search?query=${searchQuery.value}`);
+    const response = await axios.get(`https://backendpraca.onrender.com/api/products/search?query=${searchQuery.value}`);
     products.value = response.data.map(product => ({
       id: product.id,
       name: product.name,

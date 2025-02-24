@@ -1,5 +1,5 @@
 config:
-  target: "http://localhost:5000"  # Adres backendu
+  target: "https://backendpraca.onrender.com/"  # Adres backendu
   phases:
     - duration: 60  # Test trwa 60 sekund
       arrivalRate: 10  # 10 żądań na sekundę

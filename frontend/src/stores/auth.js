@@ -18,7 +18,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         console.log("📢 Rejestracja użytkownika:", name, email);
 
-        const response = await axios.post("http://localhost:5000/api/auth/register", {
+        const response = await axios.post("https://backendpraca.onrender.com/api/auth/register", {
           name,
           email,
           password,
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("auth", {
       try {
         console.log("📢 Próba logowania:", email);
     
-        const response = await axios.post("http://localhost:5000/api/auth/login", {
+        const response = await axios.post("https://backendpraca.onrender.com/api/auth/login", {
           email,
           password,
         });

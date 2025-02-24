@@ -41,7 +41,7 @@ export const useMealsStore = defineStore("meals", {
                 };
         
         
-                const response = await axios.post("http://localhost:5000/api/meals/history", mealData, {
+                const response = await axios.post("https://backendpraca.onrender.com/api/meals/history", mealData, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
                 });
         
@@ -56,7 +56,7 @@ export const useMealsStore = defineStore("meals", {
         async loadHistory() {
             try {
                 const token = localStorage.getItem("token"); // ✅ Pobranie tokena
-                const response = await axios.get("http://localhost:5000/api/meals/history", {
+                const response = await axios.get("https://backendpraca.onrender.com/api/meals/history", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 this.history = response.data;
@@ -68,7 +68,7 @@ export const useMealsStore = defineStore("meals", {
         async deleteMealGroup(id) {
             try {
                 const token = localStorage.getItem("token");
-                await axios.delete(`http://localhost:5000/api/meals/history/${id}`, {
+                await axios.delete(`https://backendpraca.onrender.com/api/meals/history/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -94,7 +94,7 @@ export const useMealsStore = defineStore("meals", {
                     return;
                 }
         
-                const response = await axios.get("http://localhost:5000/api/meals/history/today", {
+                const response = await axios.get("https://backendpraca.onrender.com/api/meals/history/today", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 

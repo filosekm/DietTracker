@@ -88,7 +88,7 @@
       // ✅ Pobranie aktualnych danych użytkownika
       onMounted(async () => {
         try {
-          const response = await axios.get("http://localhost:5000/api/user/profile", {
+          const response = await axios.get("https://backendpraca.onrender.com/api/user/profile", {
             headers: { Authorization: `Bearer ${authStore.token}` },
           });
           user.value = response.data;
@@ -122,7 +122,7 @@
       // ✅ Aktualizacja profilu
       const updateProfile = async () => {
         try {
-          await axios.put("http://localhost:5000/api/user/profile", user.value, {
+          await axios.put("https://backendpraca.onrender.com/api/user/profile", user.value, {
             headers: { Authorization: `Bearer ${authStore.token}` },
           });
           alert("Profil zaktualizowany!");
