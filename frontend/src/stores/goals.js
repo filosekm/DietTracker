@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useActivitiesStore } from "./activitiesStore";
+import axios from "axios";
 
 export const useGoalsStore = defineStore("goals", {
     state: () => ({
@@ -11,23 +11,28 @@ export const useGoalsStore = defineStore("goals", {
         },
     }),
     actions: {
-        getGoals() {
-            const storedGoals = localStorage.getItem("dietGoals");
-            if (storedGoals) {
-                this.goals = JSON.parse(storedGoals);
-                return this.goals;
+        async loadGoals() {
+            try {
+                const token = localStorage.getItem("token");
+                const response = await axios.get("https://backendpraca.onrender.com/api/users/goals", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                this.goals = response.data;
+            } catch (error) {
+                console.error("❌ Błąd pobierania celów:", error);
             }
-            return null;
         },
-        setGoals(newGoals) {
-            this.goals = { ...newGoals };
-            localStorage.setItem("dietGoals", JSON.stringify(this.goals));
-        },
-        // 📌 Nowa metoda: uwzględniamy spalone kalorie
-        getAdjustedCalories() {
-            const activitiesStore = useActivitiesStore();
-            const burnedCalories = activitiesStore.getTotalCaloriesBurned();
-            return Math.max(this.goals.calories + burnedCalories, 0);
+
+        async updateGoals(newGoals) {
+            try {
+                const token = localStorage.getItem("token");
+                await axios.put("https://backendpraca.onrender.com/api/users/goals", newGoals, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                this.goals = { ...newGoals };
+            } catch (error) {
+                console.error("❌ Błąd aktualizacji celów:", error);
+            }
         }
     }
 });

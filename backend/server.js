@@ -42,7 +42,7 @@ module.exports = (async () => {
     app.use("/api/activities", activityRoutes); // Obsługa aktywności użytkownika
     if (require.main === module) {
       const port = process.env.PORT || 5000;
-      app.listen(port, () => console.log(`🚀 Serwer działa na porcie ${port}`));
+      app.listen(port);
     }
   } catch (error) {
     console.error("❌ Błąd połączenia z bazą danych:", error.message);

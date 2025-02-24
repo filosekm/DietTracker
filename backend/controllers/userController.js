@@ -38,3 +38,40 @@ exports.updateProfile = async (req, res) => {
     }
   };
   
+  exports.getGoals = async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "Użytkownik nie znaleziony" });
+      }
+      res.json(user.goals);
+    } catch (error) {
+      console.error("❌ Błąd pobierania celów:", error);
+      res.status(500).json({ error: "Błąd serwera" });
+    }
+  };
+  
+  // ✅ Aktualizacja celów użytkownika
+  exports.updateGoals = async (req, res) => {
+    try {
+      const { calories, protein, carbs, fats } = req.body;
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: "Użytkownik nie znaleziony" });
+      }
+  
+      // 🛠 Aktualizacja celów
+      user.goals = {
+        calories: calories || user.goals.calories,
+        protein: protein || user.goals.protein,
+        carbs: carbs || user.goals.carbs,
+        fats: fats || user.goals.fats
+      };
+  
+      await user.save();
+      res.json({ message: "Cele zaktualizowane", goals: user.goals });
+    } catch (error) {
+      console.error("❌ Błąd aktualizacji celów:", error);
+      res.status(500).json({ error: "Błąd serwera" });
+    }
+  };

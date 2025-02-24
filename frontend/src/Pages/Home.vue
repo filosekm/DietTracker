@@ -23,18 +23,6 @@
       </div>
     </div>
 
-    <!-- 🔥 Powiadomienia -->
-    <div v-if="notificationsStore.notifications?.length > 0" 
-      :class="['mt-6 p-4 rounded-lg shadow-md', themeStore.theme === 'dark' ? 'bg-yellow-700 text-white' : 'bg-yellow-100 text-gray-900']">
-      <h3 class="text-lg font-semibold mb-2">Powiadomienia</h3>
-      <ul>
-        <li v-for="(notification, index) in notificationsStore.notifications" :key="index"
-          class="p-2 border-b last:border-none">
-          {{ notification.message }}
-        </li>
-      </ul>
-    </div>
-
     <!-- 🔥 Panel aktywności -->
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-center">Ostatnie aktywności</h2>
@@ -51,40 +39,40 @@
       </div>
     </div>
 
-        <div class="p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold mb-4 text-center">Dzienne spożycie</h3>
-    
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 justify-center">
-            <!-- Kalorie -->
-            <div class="flex flex-col items-center">
-              <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[calorieProgress]"></apexchart>
-              <p class="mt-2 font-semibold">Kalorie: {{ totalCalories }}/{{ goals.calories }} kcal</p>
-            </div>
-    
-            <!-- Białko -->
-            <div class="flex flex-col items-center">
-              <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[proteinProgress]"></apexchart>
-              <p class="mt-2 font-semibold">Białko: {{ totalProtein }}/{{ goals.protein }} g</p>
-            </div>
-    
-            <!-- Węglowodany -->
-            <div class="flex flex-col items-center">
-              <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[carbsProgress]"></apexchart>
-              <p class="mt-2 font-semibold">Węglowodany: {{ totalCarbs }}/{{ goals.carbs }} g</p>
-            </div>
+    <div class="p-6 rounded-lg shadow-md">
+      <h3 class="text-xl font-semibold mb-4 text-center">Dzienne spożycie</h3>
 
-            <div class="flex flex-col items-center">
-              <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[fatsProgress]"></apexchart>
-              <p class="mt-2 font-semibold">Tłuszcze: {{ totalFats }}/{{ goals.fats }} g</p>
-            </div>
-          </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 justify-center">
+        <!-- Kalorie -->
+        <div class="flex flex-col items-center">
+          <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[calorieProgress]"></apexchart>
+          <p class="mt-2 font-semibold">Kalorie: {{ totalCalories }}/{{ goals.calories }} kcal</p>
+        </div>
+
+        <!-- Białko -->
+        <div class="flex flex-col items-center">
+          <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[proteinProgress]"></apexchart>
+          <p class="mt-2 font-semibold">Białko: {{ totalProtein }}/{{ goals.protein }} g</p>
+        </div>
+
+        <!-- Węglowodany -->
+        <div class="flex flex-col items-center">
+          <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[carbsProgress]"></apexchart>
+          <p class="mt-2 font-semibold">Węglowodany: {{ totalCarbs }}/{{ goals.carbs }} g</p>
+        </div>
+
+        <!-- Tłuszcze -->
+        <div class="flex flex-col items-center">
+          <apexchart v-if="isApexLoaded" type="radialBar" height="250" :options="chartOptions" :series="[fatsProgress]"></apexchart>
+          <p class="mt-2 font-semibold">Tłuszcze: {{ totalFats }}/{{ goals.fats }} g</p>
         </div>
       </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import VueApexCharts from "vue3-apexcharts";
 import { useMealsStore } from "../stores/meals";
 import { useGoalsStore } from "../stores/goals";
 import { useNotificationsStore } from "../stores/notificationsStore";
@@ -98,23 +86,29 @@ const activitiesStore = useActivitiesStore();
 const themeStore = useThemeStore();
 
 const todayMeals = ref([]);
-const latestActivities = ref([]);
+const isApexLoaded = ref(false);
+
 onMounted(() => {
   setTimeout(() => {
     isApexLoaded.value = true;
   }, 500);
 });
-const isApexLoaded = ref(false);
-// ✅ Pobieranie dzisiejszych posiłków
+
+// ✅ Pobieranie dzisiejszych posiłków i aktywności
 onMounted(async () => {
   try {
     await mealsStore.fetchTodayMeals();
     todayMeals.value = mealsStore.todayMeals || [];
-    activitiesStore.loadActivities();
+    await activitiesStore.loadActivities(); // Pobranie aktywności
   } catch (error) {
-    console.error("❌ Błąd pobierania dzisiejszych posiłków:", error);
+    console.error("❌ Błąd pobierania danych:", error);
     todayMeals.value = [];
   }
+});
+
+// ✅ Pobranie 5 ostatnich aktywności
+const latestActivities = computed(() => {
+  return activitiesStore.activities.slice(-5).reverse();
 });
 
 // ✅ Pobieranie celów dietetycznych użytkownika
@@ -139,6 +133,7 @@ const calorieProgress = computed(() => Math.min((totalCalories.value / goals.val
 const proteinProgress = computed(() => Math.min((totalProtein.value / goals.value.protein) * 100, 100) || 0);
 const carbsProgress = computed(() => Math.min((totalCarbs.value / goals.value.carbs) * 100, 100) || 0);
 const fatsProgress = computed(() => Math.min((totalFats.value / goals.value.fats) * 100, 100) || 0);
+
 // ✅ Konfiguracja ApexCharts
 const chartOptions = computed(() => ({
   chart: {
@@ -160,9 +155,7 @@ const chartOptions = computed(() => ({
         },
         value: {
           fontSize: "14px",
-          formatter: function (val) {
-            return val.toFixed(1) + "%";
-          },
+          formatter: (val) => `${val.toFixed(1)}%`,
         },
       },
     },
