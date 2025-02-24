@@ -14,7 +14,7 @@
     "@vueuse/core": "^12.7.0",
     "apexcharts": "^4.4.0",
     "axios": "^1.7.9",
-    "chart.js": "^4.4.7",
+    "chart.js": "^4.4.8",
     "frontend": "file:",
     "lodash": "^4.17.21",
     "pinia": "^3.0.1",
