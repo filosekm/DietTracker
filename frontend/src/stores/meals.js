@@ -12,7 +12,7 @@ export const useMealsStore = defineStore("meals", {
                 id: product.id || Date.now(),
                 name: product.name || "Nieznany produkt",
                 calories: product.calories || 0,
-                proteins: product.proteins || 0,
+                protein: product.protein || 0,
                 carbs: product.carbs || 0,
                 fats: product.fats || 0,
             };
@@ -39,7 +39,7 @@ export const useMealsStore = defineStore("meals", {
                         id: meal.id || Date.now(),
                         name: meal.name || "Nieznany posiłek",
                         calories: meal.calories || 0,
-                        protein: meal.proteins || 0, // 🚀 Spójność nazewnictwa
+                        protein: meal.protein || 0, // 🚀 Spójność nazewnictwa
                         carbs: meal.carbs || 0,
                         fats: meal.fats || 0
                     }))
@@ -65,7 +65,6 @@ export const useMealsStore = defineStore("meals", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
         
-                console.log("📜 Dane zwrócone przez API:", response.data);
                 this.history = response.data;
             } catch (error) {
                 console.error("❌ Błąd pobierania historii:", error);

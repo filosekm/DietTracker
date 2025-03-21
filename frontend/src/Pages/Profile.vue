@@ -1,50 +1,53 @@
 <template>
-  <div class="container mx-auto p-6">
-    <h2 class="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-white">Mój profil</h2>
+  <div :class="['container mx-auto p-6 min-h-screen transition', isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900']">
+    <h2 class="text-3xl font-bold mb-4 text-center">Mój profil</h2>
 
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <div :class="[isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900', 'p-6 rounded-lg shadow-md']">
       <!-- Informacje o użytkowniku -->
       <div class="flex flex-col items-center gap-4">
-        <div class="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl font-bold">
-          {{ initials }}
-        </div>
+        <div
+        :class="[
+          'w-24 h-24 rounded-full flex items-center justify-center text-2xl font-bold',
+          isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-900'
+        ]"
+      >
+        {{ initials }}
+      </div>
 
-        <p class="text-xl font-semibold text-gray-900 dark:text-white">
-          {{ user.name || authStore.user?.name }}
-        </p>
+        <p class="text-xl font-semibold">{{ user.name || authStore.user?.name }}</p>
         <p class="text-gray-500 dark:text-gray-400">{{ authStore.user?.email }}</p>
       </div>
 
       <!-- Formularz edycji profilu -->
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mt-4">
+      <div :class="[isDarkMode ? 'bg-gray-800' : 'bg-white', 'p-6 rounded-lg shadow-md mt-4']">
         <form @submit.prevent="validateAndSubmit">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-gray-700 dark:text-white">Imię</label>
-              <input v-model="user.name" type="text" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"/>
+              <label for="name" :class="labelClass">Imię</label>
+              <input id="name" v-model="user.name" type="text" :class="inputClass" />
             </div>
 
             <div>
-              <label class="block text-gray-700 dark:text-white">Wiek</label>
-              <input v-model="user.age" type="number" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"/>
+              <label for="age" :class="labelClass">Wiek</label>
+              <input id="age" v-model="user.age" type="number" :class="inputClass" />
               <p v-if="errors.age" class="text-red-500 text-sm mt-1">{{ errors.age }}</p>
             </div>
 
             <div>
-              <label class="block text-gray-700 dark:text-white">Waga (kg)</label>
-              <input v-model="user.weight" type="number" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"/>
+              <label for="weight" :class="labelClass">Waga (kg)</label>
+              <input id="weight" v-model="user.weight" type="number" :class="inputClass" />
               <p v-if="errors.weight" class="text-red-500 text-sm mt-1">{{ errors.weight }}</p>
             </div>
 
             <div>
-              <label class="block text-gray-700 dark:text-white">Wzrost (cm)</label>
-              <input v-model="user.height" type="number" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white"/>
+              <label for="height" :class="labelClass">Wzrost (cm)</label>
+              <input id="height" v-model="user.height" type="number" :class="inputClass" />
               <p v-if="errors.height" class="text-red-500 text-sm mt-1">{{ errors.height }}</p>
             </div>
 
             <div>
-              <label class="block text-gray-700 dark:text-white">Poziom aktywności</label>
-              <select v-model="user.activity_level" class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+              <label for="activity_level" :class="labelClass">Poziom aktywności</label>
+              <select id="activity_level" v-model="user.activity_level" :class="inputClass">
                 <option value="niski">Niski</option>
                 <option value="średni">Średni</option>
                 <option value="wysoki">Wysoki</option>
@@ -63,10 +66,8 @@
       </div>
 
       <!-- Przycisk wylogowania -->
-      <button 
-        @click="logout"
-        class="w-full mt-4 bg-red-500 text-white p-3 rounded-lg font-semibold hover:bg-red-600 transition duration-200"
-      >
+      <button @click="logout"
+        class="w-full mt-4 bg-red-500 text-white p-3 rounded-lg font-semibold hover:bg-red-600 transition duration-200">
         🚪 Wyloguj się
       </button>
     </div>
@@ -77,8 +78,12 @@
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useAuthStore } from "../stores/auth";
+import { useThemeStore } from "../composables/theme";
 
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
+const isDarkMode = computed(() => themeStore.theme === "dark");
+
 const user = ref({
   name: "",
   age: null,
@@ -86,18 +91,19 @@ const user = ref({
   height: null,
   activity_level: "średni",
 });
+
 const errors = ref({});
 const message = ref("");
 const error = ref("");
 
-// 🔹 Pobieranie inicjałów użytkownika
+// 🔹 Inicjały użytkownika
 const initials = computed(() => {
   return user.value.name
     ? user.value.name.split(" ").map(n => n[0]).join("").toUpperCase()
     : "U";
 });
 
-// ✅ Pobranie aktualnych danych użytkownika po zalogowaniu
+// ✅ Pobieranie danych profilu
 onMounted(async () => {
   try {
     const response = await axios.get("https://backendpraca.onrender.com/api/users/profile", {
@@ -105,12 +111,12 @@ onMounted(async () => {
     });
     user.value = response.data;
   } catch (err) {
-    console.error("Błąd pobierania profilu:", err);
+     console.error("Błąd pobierania profilu:", err);
     error.value = "Nie udało się załadować profilu.";
   }
 });
 
-// ✅ Funkcja walidacji przed wysłaniem formularza
+// ✅ Walidacja formularza
 const validateAndSubmit = async () => {
   errors.value = {};
 
@@ -135,20 +141,30 @@ const validateAndSubmit = async () => {
 // ✅ Aktualizacja profilu
 const updateProfile = async () => {
   try {
-    const response = await axios.put("https://backendpraca.onrender.com/api/users/profile", user.value, {
+    await axios.put("https://backendpraca.onrender.com/api/users/profile", user.value, {
       headers: { Authorization: `Bearer ${authStore.token}` },
     });
-    message.value = "Profil zaktualizowany!";
+    window.addNotification("Profil zaktualizowany!");
     error.value = "";
   } catch (err) {
-    console.error("Błąd aktualizacji profilu:", err);
+     window.addNotification("Błąd aktualizacji profilu:", err);
     error.value = "Nie udało się zaktualizować profilu.";
   }
 };
 
-// ✅ Funkcja wylogowania użytkownika
+// ✅ Wylogowanie
 const logout = () => {
   authStore.logout();
   window.location.reload();
 };
+
+// ✅ Klasy do formularzy zależne od motywu
+const inputClass = computed(() => [
+  "w-full p-2 border rounded-md focus:ring-2 focus:outline-none transition",
+  isDarkMode.value
+    ? "bg-gray-700 text-white border-gray-600 placeholder-gray-400 focus:ring-blue-500"
+    : "bg-white text-gray-900 border-gray-300 placeholder-gray-500 focus:ring-blue-400"
+]);
+
+const labelClass = computed(() => isDarkMode.value ? "block text-white" : "block text-gray-700");
 </script>

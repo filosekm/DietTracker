@@ -13,18 +13,24 @@ export const useGoalsStore = defineStore("goals", {
     actions: {
         async loadGoals() {
             try {
-                const token = localStorage.getItem("token");
-                if (!token) throw new Error("Brak tokena!");
-
-                const response = await axios.get("https://backendpraca.onrender.com/api/users/goals", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-
-                this.goals = response.data;
+              const token = localStorage.getItem("token");
+              if (!token) throw new Error("Brak tokena!");
+          
+              const response = await axios.get("https://backendpraca.onrender.com/api/users/goals", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+          
+              this.goals = {
+                calories: response.data.calories ?? 2000,
+                protein: response.data.protein ?? 100,
+                carbs: response.data.carbs ?? 250,
+                fats: response.data.fats ?? 70,
+              };
+          
             } catch (error) {
-                console.error("❌ Błąd pobierania celów:", error.response?.data || error.message);
+              console.error("❌ Błąd pobierania celów:", error.response?.data || error.message);
             }
-        },
+          },
 
         async updateGoals(newGoals) {
             try {
@@ -36,6 +42,7 @@ export const useGoalsStore = defineStore("goals", {
                 });
 
                 this.goals = response.data.goals;
+                
             } catch (error) {
                 console.error("❌ Błąd aktualizacji celów:", error.response?.data || error.message);
             }

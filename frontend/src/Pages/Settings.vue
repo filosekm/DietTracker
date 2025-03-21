@@ -1,75 +1,98 @@
 <template>
-  <div class="container mx-auto p-6">
-    <h2 class="text-3xl font-bold mb-4 text-center text-gray-900 dark:text-white">Ustawienia Celów</h2>
+  <div :class="['container mx-auto p-6 min-h-screen', isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900']">
+    <h2 class="text-3xl font-bold mb-4 text-center" id="goals-heading">
+      Ustawienia Celów
+    </h2>
 
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Twoje cele</h3>
-      
+    <div
+      :class="[isDarkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-900', 'p-6 rounded-lg shadow-md']"
+      role="form"
+      aria-labelledby="goals-heading"
+    >
+      <h3 class="text-xl font-semibold mb-4">Twoje cele</h3>
+
       <form @submit.prevent="updateGoals" class="space-y-4">
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium">Cel Kaloryczny (kcal)</label>
-          <input v-model="calories" type="number" min="0"
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-white" />
+          <label for="calories" :class="labelClass">Cel Kaloryczny (kcal)</label>
+          <input id="calories" v-model="calories" type="number" min="0"
+            :class="[inputBaseClass, isDarkMode ? inputDark : inputLight]" required />
         </div>
 
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium">Białko (g)</label>
-          <input v-model="protein" type="number" min="0"
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-green-400 dark:bg-gray-700 dark:text-white" />
+          <label for="protein" :class="labelClass">Białko (g)</label>
+          <input id="protein" v-model="protein" type="number" min="0"
+            :class="[inputBaseClass, isDarkMode ? inputDark : inputLight, 'focus:ring-green-400']" required />
         </div>
 
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium">Węglowodany (g)</label>
-          <input v-model="carbs" type="number" min="0"
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-yellow-400 dark:bg-gray-700 dark:text-white" />
+          <label for="carbs" :class="labelClass">Węglowodany (g)</label>
+          <input id="carbs" v-model="carbs" type="number" min="0"
+            :class="[inputBaseClass, isDarkMode ? inputDark : inputLight, 'focus:ring-yellow-400']" required />
         </div>
 
         <div>
-          <label class="block text-gray-700 dark:text-gray-300 font-medium">Tłuszcze (g)</label>
-          <input v-model="fats" type="number" min="0"
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-red-400 dark:bg-gray-700 dark:text-white" />
+          <label for="fats" :class="labelClass">Tłuszcze (g)</label>
+          <input id="fats" v-model="fats" type="number" min="0"
+            :class="[inputBaseClass, isDarkMode ? inputDark : inputLight, 'focus:ring-red-400']" required />
         </div>
 
-        <button type="submit"
-          class="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-200">
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-600 transition duration-200"
+        >
           Zapisz zmiany
         </button>
       </form>
 
-      <!-- ✅ Komunikat o sukcesie lub błędzie -->
-      <p v-if="successMessage" class="text-green-500 font-medium mt-4">{{ successMessage }}</p>
-      <p v-if="errorMessage" class="text-red-500 font-medium mt-4">{{ errorMessage }}</p>
+      <!-- Komunikaty -->
+      <p v-if="successMessage" class="text-green-400 font-medium mt-4" aria-live="polite">
+        {{ successMessage }}
+      </p>
+      <p v-if="errorMessage" class="text-red-400 font-medium mt-4" aria-live="assertive">
+        {{ errorMessage }}
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useGoalsStore } from "../stores/goals";
+import { ref, computed, onMounted } from 'vue'
+import { useGoalsStore } from '../stores/goals'
+import { useThemeStore } from '../composables/theme'
 
-const goalsStore = useGoalsStore();
+const themeStore = useThemeStore()
+const isDarkMode = computed(() => themeStore.theme === 'dark')
 
-const calories = ref(2000);
-const protein = ref(100);
-const carbs = ref(250);
-const fats = ref(70);
-const successMessage = ref("");
-const errorMessage = ref("");
+const goalsStore = useGoalsStore()
 
-// ✅ Pobranie celów dietetycznych użytkownika przy załadowaniu strony
+const calories = ref(2000)
+const protein = ref(100)
+const carbs = ref(250)
+const fats = ref(70)
+
+const successMessage = ref('')
+const errorMessage = ref('')
+
+// Style bazowe
+const inputBaseClass = 'w-full p-2 border rounded-md focus:ring-2 focus:outline-none transition'
+const inputDark = 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+const inputLight = 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+const labelClass = computed(() => isDarkMode.value ? 'block font-medium text-gray-300' : 'block font-medium text-gray-700')
+
+// Pobierz cele na starcie
 onMounted(async () => {
   try {
-    await goalsStore.loadGoals();
-    calories.value = goalsStore.goals.calories;
-    protein.value = goalsStore.goals.protein;
-    carbs.value = goalsStore.goals.carbs;
-    fats.value = goalsStore.goals.fats;
+    await goalsStore.loadGoals()
+    calories.value = goalsStore.goals.calories
+    protein.value = goalsStore.goals.protein
+    carbs.value = goalsStore.goals.carbs
+    fats.value = goalsStore.goals.fats
   } catch (error) {
-    errorMessage.value = "Nie udało się pobrać celów.";
+    errorMessage.value = 'Nie udało się pobrać celów.'
   }
-});
+})
 
-// ✅ Aktualizacja celów w bazie danych
+// Zapisz cele
 const updateGoals = async () => {
   try {
     await goalsStore.updateGoals({
@@ -77,13 +100,14 @@ const updateGoals = async () => {
       protein: parseInt(protein.value),
       carbs: parseInt(carbs.value),
       fats: parseInt(fats.value)
-    });
+    })
 
-    successMessage.value = "Cele zostały zaktualizowane!";
-    setTimeout(() => (successMessage.value = ""), 3000);
+    window.addNotifiaction('Cele zostały zaktualizowane!');
+    errorMessage.value = ''
+    setTimeout(() => (successMessage.value = ''), 3000)
   } catch (error) {
-    errorMessage.value = "Wystąpił błąd podczas zapisywania celów.";
-    setTimeout(() => (errorMessage.value = ""), 3000);
+    errorMessage.value = 'Wystąpił błąd podczas zapisywania celów.'
+    setTimeout(() => (errorMessage.value = ''), 3000)
   }
-};
+}
 </script>
